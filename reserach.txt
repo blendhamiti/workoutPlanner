@@ -1,0 +1,6 @@
+DAO - design pattern
+    Hibernate - DAO implementation
+    
+    - make sure to transform to lowercase/uppercase while adding/getting to/from database
+
+Java AWT - GUI library
