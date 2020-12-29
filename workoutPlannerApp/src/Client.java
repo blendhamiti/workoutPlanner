@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class Client {
 
@@ -6,7 +7,6 @@ public class Client {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                createAndShowGui();
             }
         });
     }
@@ -16,7 +16,7 @@ public class Client {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JLabel label = new JLabel("Hello!");
-        frame.getContentPane().add(label);
+        frame.getContentPane().add(label, BorderLayout.CENTER);
 
         frame.pack();
         frame.setVisible(true);
