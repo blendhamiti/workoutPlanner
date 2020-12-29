@@ -1,12 +1,12 @@
 import java.sql.*;
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 public class WorkoutPlannerDaoImpl implements WorkoutPlannerDao {
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String DATABASE_URL = "jdbc:mysql://localhost/workout_planner";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
+    // private static final String PASSWORD = "root";
+    private static final String PASSWORD = "";
     private Connection connection;
 
     public WorkoutPlannerDaoImpl() {
@@ -20,8 +20,8 @@ public class WorkoutPlannerDaoImpl implements WorkoutPlannerDao {
     }
 
     @Override
-    public Collection<Exercise> getExercises() {
-        Collection<Exercise> exercises = new LinkedHashSet<>();
+    public List<Exercise> getExercises() {
+        List<Exercise> exercises = new ArrayList<>();
         try {
             PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM exercises");
             ResultSet rs = pstmt.executeQuery();
@@ -111,8 +111,8 @@ public class WorkoutPlannerDaoImpl implements WorkoutPlannerDao {
         }
     }
 
-    private Collection<Exercise> getRoutineExercises(String routineName) {
-        Collection<Exercise> exercises = new LinkedHashSet<>();
+    private List<Exercise> getRoutineExercises(String routineName) {
+        List<Exercise> exercises = new ArrayList<>();
         try {
             PreparedStatement pstmt = connection.prepareStatement(
                     "SELECT e.name, e.duration, e.repetitions, e.sets " +
@@ -137,8 +137,8 @@ public class WorkoutPlannerDaoImpl implements WorkoutPlannerDao {
     }
 
     @Override
-    public Collection<Routine> getRoutines() {
-        Collection<Routine> routines = new LinkedHashSet<>();
+    public List<Routine> getRoutines() {
+        List<Routine> routines = new ArrayList<>();
         try {
             PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM routines");
             ResultSet rs = pstmt.executeQuery();

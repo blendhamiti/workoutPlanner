@@ -1,8 +1,8 @@
-import java.util.Collection;
+import java.util.List;
 
 public interface WorkoutPlannerDao {
 
-    Collection<Exercise> getExercises();
+    List<Exercise> getExercises();
 
     Exercise getExercise(String name);
 
@@ -12,7 +12,7 @@ public interface WorkoutPlannerDao {
 
     void removeExercise(Exercise exercise);
 
-    Collection<Routine> getRoutines();
+    List<Routine> getRoutines();
 
     Routine getRoutine(String name);
 

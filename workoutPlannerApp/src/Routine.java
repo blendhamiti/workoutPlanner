@@ -1,11 +1,11 @@
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 public class Routine {
     private final String name;
-    private final Collection<Exercise> exercises;
+    private final List<Exercise> exercises;
 
-    public Routine(String name, Collection<Exercise> exercises) {
+    public Routine(String name, List<Exercise> exercises) {
         this.name = name;
         this.exercises = exercises;
     }
@@ -14,7 +14,7 @@ public class Routine {
         return name;
     }
 
-    public Collection<Exercise> getExercises() {
+    public List<Exercise> getExercises() {
         return exercises;
     }
 
