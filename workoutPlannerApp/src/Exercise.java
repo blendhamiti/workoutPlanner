@@ -1,7 +1,7 @@
 import java.util.Objects;
 
 public class Exercise {
-    private String name;
+    private final String name;
     private int duration, repetitions, sets;
 
     public Exercise(String name, int duration, int repetitions, int sets) {
@@ -13,10 +13,6 @@ public class Exercise {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public int getDuration() {

@@ -2,7 +2,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 public class Routine {
-    private String name;
+    private final String name;
     private final Collection<Exercise> exercises;
 
     public Routine(String name, Collection<Exercise> exercises) {
@@ -12,10 +12,6 @@ public class Routine {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Collection<Exercise> getExercises() {
