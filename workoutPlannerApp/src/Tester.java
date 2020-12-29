@@ -1,4 +1,4 @@
-public class User {
+public class Tester {
 
     public static void main(String[] args) {
         WorkoutPlannerDao workoutPlanner = new WorkoutPlannerDaoImpl();
