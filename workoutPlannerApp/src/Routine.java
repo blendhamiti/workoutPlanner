@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -6,12 +7,13 @@ public class Routine {
     private String name;
     private final List<Exercise> exercises;
 
-    public Routine(String name, List<Exercise> exercises) {
+    public Routine(String name) {
         this.name = name;
-        this.exercises = exercises;
+        this.exercises = new ArrayList<>();
     }
 
     public Routine(int id, String name, List<Exercise> exercises) {
+        this.id = id;
         this.name = name;
         this.exercises = exercises;
     }
