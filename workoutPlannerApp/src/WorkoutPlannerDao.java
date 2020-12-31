@@ -4,7 +4,7 @@ public interface WorkoutPlannerDao {
 
     List<Exercise> getExercises();
 
-    Exercise getExercise(String name);
+    Exercise getExercise(int id);
 
     void addExercise(Exercise exercise);
 
@@ -14,9 +14,11 @@ public interface WorkoutPlannerDao {
 
     List<Routine> getRoutines();
 
-    Routine getRoutine(String name);
+    Routine getRoutine(int id);
 
     void addRoutine(Routine routine);
+
+    void updateRoutine(Routine routine);
 
     void removeRoutine(Routine routine);
 

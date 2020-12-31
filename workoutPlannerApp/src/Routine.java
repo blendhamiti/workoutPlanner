@@ -2,7 +2,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class Routine {
-    private final String name;
+    private int id;
+    private String name;
     private final List<Exercise> exercises;
 
     public Routine(String name, List<Exercise> exercises) {
@@ -10,8 +11,25 @@ public class Routine {
         this.exercises = exercises;
     }
 
+    public Routine(int id, String name, List<Exercise> exercises) {
+        this.name = name;
+        this.exercises = exercises;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public List<Exercise> getExercises() {
@@ -31,12 +49,12 @@ public class Routine {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Routine routine = (Routine) o;
-        return name.equals(routine.name);
+        return id == routine.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(id);
     }
 
     @Override

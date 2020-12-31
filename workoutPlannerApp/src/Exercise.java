@@ -1,8 +1,11 @@
 import java.util.Objects;
 
 public class Exercise {
-    private final String name;
-    private int duration, repetitions, sets;
+    private int id;
+    private String name;
+    private int duration;
+    private int repetitions;
+    private int sets;
 
     public Exercise(String name, int duration, int repetitions, int sets) {
         this.name = name;
@@ -11,8 +14,28 @@ public class Exercise {
         this.sets = sets;
     }
 
+    public Exercise(int id, String name, int duration, int repetitions, int sets) {
+        this.id = id;
+        this.name = name;
+        this.duration = duration;
+        this.repetitions = repetitions;
+        this.sets = sets;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getDuration() {
@@ -44,12 +67,12 @@ public class Exercise {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Exercise exercise = (Exercise) o;
-        return name.equals(exercise.name);
+        return id == exercise.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(id);
     }
 
     @Override
