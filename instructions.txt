@@ -1,7 +1,7 @@
 Workout Planner - Documentation 
 
 Database configuration 
-First, you will need to create the sample database to use with the program. In the project zip file, there is a folder '/mysql' which contain the create statements queries (create_statements.sql). Running these queries in a MySQL server (preferably v8.0) will create the schema and the tables used in the program. After creating the tables, you can populate them with the data found in ‘/mysql/table-data’. Each .csv file in this folder contains data for the table with the same name. (Tip: you can use the MySQL Workbench import wizard to easily import the data into the tables.) 
+First, you will need to create the sample database to use with the program. In the project zip file, there is a folder '/mysql' which contain the create statements queries (create_statements.sql). Running these queries in a MySQL server (preferably v8.0) will create the schema and the tables used in the program. After creating the tables, you can populate them with the data found in ‘/mysql/table-data’. Each .csv file in this folder contains data for the table with the same name. It is important that you import data of table 'routines_exercises' last, because it contains relationships between the other two tables and requires data on both of them to be imported successfully. (Tip: you can use the MySQL Workbench import wizard to easily import the data into the tables.) 
 
 Running the program 
 Before running the program, you also need to configure the program to work with your database. To do so, edit the WorkoutPlannerDaoImpl class and add the correct information for the fields JDBC_DRIVER, DATABSE_URL, USERNAME and PASSWORD. Finally, run the program by running the Client class. 
