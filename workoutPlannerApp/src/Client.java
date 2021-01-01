@@ -18,6 +18,7 @@ public class Client {
     List<Routine> routines;
     List<Exercise> exercises;
     Routine selectedRoutine;
+    int selectedRoutineIndex;
     List<Exercise> routineExercises;
 
     private JPanel rootPanel;
@@ -44,6 +45,7 @@ public class Client {
         removeSelectedExerciseButton.setEnabled(false);
         addExerciseToRoutineButton.setEnabled(false);
         deleteExerciseFromRoutineButton.setEnabled(false);
+        final boolean[] addExerciseToRoutineButtonState = {false};
 
         // get models
         DefaultListModel<String> routinesListModel = (DefaultListModel<String>) routinesList.getModel();
@@ -55,12 +57,15 @@ public class Client {
         routinesList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
                 int selectedIndex = routinesList.getSelectedIndex();
+                selectedRoutineIndex = selectedIndex;
                 if (selectedIndex < 0) {
                     selectedRoutine = null;
                     routineExercises = new ArrayList<>();
                     selectedRoutineLabel.setText("Selected routine: ");
                     removeSelectedRoutineButton.setEnabled(false);
+                    addExerciseToRoutineButton.setEnabled(false);
                 } else {
                     selectedRoutine = routines.get(selectedIndex);
                     routineExercises = selectedRoutine.getExercises();
@@ -106,30 +111,41 @@ public class Client {
                     };
                     routineExercisesTable.setModel(tableModel);
                     removeSelectedRoutineButton.setEnabled(true);
+                    if (addExerciseToRoutineButtonState[0])
+                        addExerciseToRoutineButton.setEnabled(true);
                 }
             }
         });
+        exercisesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         exercisesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
                 int selectedRow = exercisesTable.getSelectedRow();
                 if (selectedRow < 0) {
                     removeSelectedExerciseButton.setEnabled(false);
                     addExerciseToRoutineButton.setEnabled(false);
                 } else {
                     removeSelectedExerciseButton.setEnabled(true);
-                    addExerciseToRoutineButton.setEnabled(true);
+                    if (selectedRoutine != null)
+                        addExerciseToRoutineButton.setEnabled(true);
+                    else
+                        addExerciseToRoutineButtonState[0] = true;
                 }
             }
         });
+        routineExercisesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         routineExercisesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
                 int selectedRow = routineExercisesTable.getSelectedRow();
-                if (selectedRow < 0)
+                if (selectedRow < 0) {
                     deleteExerciseFromRoutineButton.setEnabled(false);
-                else
+                }
+                else {
                     deleteExerciseFromRoutineButton.setEnabled(true);
+                }
             }
         });
 
@@ -161,6 +177,7 @@ public class Client {
                     routines.remove(routine);
                     workoutPlannerDao.removeRoutine(routine);
                     routinesListModel.remove(selectedIndex);
+                    routineExercisesTable.invalidate();
                 }
             }
         });
@@ -180,8 +197,18 @@ public class Client {
                 if (selectedRowIndex >= 0) {
                     Exercise exercise = exercises.get(selectedRowIndex);
                     exercises.remove(exercise);
+                    for (Routine routine : routines) {
+                        routine.getExercises().remove(exercise);
+                        workoutPlannerDao.removeRoutineExercise(routine, exercise);
+                    }
                     workoutPlannerDao.removeExercise(exercise);
                     exercisesTableModel.fireTableRowsDeleted(exercises.size() - 1, exercises.size() - 1);
+                    routinesList.getListSelectionListeners()[0].valueChanged(
+                            new ListSelectionEvent(
+                                    selectedRoutine,
+                                    selectedRoutineIndex,
+                                    selectedRoutineIndex,
+                                    false));
                 }
             }
         });
@@ -191,9 +218,17 @@ public class Client {
                 int selectedRowIndex = exercisesTable.getSelectedRow();
                 if (selectedRowIndex >= 0) {
                     Exercise exercise = exercises.get(selectedRowIndex);
-                    routineExercises.add(exercise);
-                    workoutPlannerDao.addRoutineExercise(selectedRoutine, exercise);
-                    routineExercisesTableModel.fireTableRowsInserted(routineExercises.size() - 1, routineExercises.size() - 1);
+                    if (!routineExercises.contains(exercise)) {
+                        routineExercises.add(exercise);
+                        workoutPlannerDao.addRoutineExercise(selectedRoutine, exercise);
+                        routineExercisesTable.invalidate();
+                        routinesList.getListSelectionListeners()[0].valueChanged(
+                                new ListSelectionEvent(
+                                        selectedRoutine,
+                                        selectedRoutineIndex,
+                                        selectedRoutineIndex,
+                                        false));
+                    }
                 }
             }
         });
@@ -206,6 +241,12 @@ public class Client {
                     routineExercises.remove(exercise);
                     workoutPlannerDao.removeRoutineExercise(selectedRoutine, exercise);
                     routineExercisesTableModel.fireTableRowsDeleted(routineExercises.size() - 1, routineExercises.size() - 1);
+                    routinesList.getListSelectionListeners()[0].valueChanged(
+                            new ListSelectionEvent(
+                                    selectedRoutine,
+                                    selectedRoutineIndex,
+                                    selectedRoutineIndex,
+                                    false));
                 }
             }
         });
@@ -227,10 +268,76 @@ public class Client {
         }
         routinesList = new JList<>(listModel);
 
+        // create routine exercises table
+        AbstractTableModel routineExercisesTableModel = new AbstractTableModel() {
+            final String[] columnsNames = new String[]{"Name", "Duration", "Repetitions", "Sets"};
+            final Class[] columnsClasses = new Class[]{String.class, Integer.class, Integer.class, Integer.class};
+
+            @Override
+            public String getColumnName(int column) {
+                return columnsNames[column];
+            }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return columnsClasses[columnIndex];
+            }
+
+            @Override
+            public int getRowCount() {
+                return routineExercises.size();
+            }
+
+            @Override
+            public int getColumnCount() {
+                return columnsNames.length;
+            }
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                switch (columnIndex) {
+                    case 0:
+                        return routineExercises.get(rowIndex).getName();
+                    case 1:
+                        return routineExercises.get(rowIndex).getDuration();
+                    case 2:
+                        return routineExercises.get(rowIndex).getRepetitions();
+                    case 3:
+                        return routineExercises.get(rowIndex).getSets();
+                    default:
+                        return null;
+                }
+            }
+
+            @Override
+            public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+                switch (columnIndex) {
+                    case 0:
+                        routineExercises.get(rowIndex).setName((String) aValue);
+                        break;
+                    case 1:
+                        routineExercises.get(rowIndex).setDuration((Integer) aValue);
+                        break;
+                    case 2:
+                        routineExercises.get(rowIndex).setRepetitions((Integer) aValue);
+                        break;
+                    case 3:
+                        routineExercises.get(rowIndex).setSets((Integer) aValue);
+                        break;
+                }
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return false;
+            }
+        };
+        routineExercisesTable = new JTable(routineExercisesTableModel);
+
         // create all exercises table
-        TableModel tableModel = new AbstractTableModel() {
-            String[] columnsNames = new String[]{"Name", "Duration", "Repetitions", "Sets"};
-            Class[] columnsClasses = new Class[]{String.class, Integer.class, Integer.class, Integer.class};
+        AbstractTableModel exercisesTableModel = new AbstractTableModel() {
+            final String[] columnsNames = new String[]{"Name", "Duration", "Repetitions", "Sets"};
+            final Class[] columnsClasses = new Class[]{String.class, Integer.class, Integer.class, Integer.class};
 
             @Override
             public String getColumnName(int column) {
@@ -290,51 +397,10 @@ public class Client {
                         break;
                 }
                 workoutPlannerDao.updateExercise(exercises.get(rowIndex));
+                routineExercisesTableModel.fireTableDataChanged();
             }
         };
-        exercisesTable = new JTable(tableModel);
-
-        // create routine exercises table
-        tableModel = new AbstractTableModel() {
-            String[] columnsNames = new String[]{"Name", "Duration", "Repetitions", "Sets"};
-
-            @Override
-            public String getColumnName(int column) {
-                return columnsNames[column];
-            }
-
-            @Override
-            public int getRowCount() {
-                return routineExercises.size();
-            }
-
-            @Override
-            public int getColumnCount() {
-                return columnsNames.length;
-            }
-
-            @Override
-            public Object getValueAt(int rowIndex, int columnIndex) {
-                switch (columnIndex) {
-                    case 0:
-                        return routineExercises.get(rowIndex).getName();
-                    case 1:
-                        return routineExercises.get(rowIndex).getDuration();
-                    case 2:
-                        return routineExercises.get(rowIndex).getRepetitions();
-                    case 3:
-                        return routineExercises.get(rowIndex).getSets();
-                    default:
-                        return null;
-                }
-            }
-
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return false;
-            }
-        };
-        routineExercisesTable = new JTable(tableModel);
+        exercisesTable = new JTable(exercisesTableModel);
     }
 
     /**

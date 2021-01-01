@@ -218,8 +218,6 @@ public class WorkoutPlannerDaoImpl implements WorkoutPlannerDao {
 
     @Override
     public void addRoutineExercise(Routine routine, Exercise exercise) {
-        // check if relation already exists
-        if (getRoutineExercises(routine.getId()).contains(exercise)) return;
         try {
             PreparedStatement pstmt = connection.prepareStatement(
                     "INSERT INTO routine_exercises (routine_id, exercise_id) VALUES (?, ?)");
