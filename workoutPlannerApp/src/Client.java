@@ -71,7 +71,7 @@ public class Client {
                     routineExercises = selectedRoutine.getExercises();
                     selectedRoutineLabel.setText("Selected routine: " + selectedRoutine.getName());
                     TableModel tableModel = new AbstractTableModel() {
-                        String[] columnsNames = new String[]{"Name", "Duration", "Repetitions", "Sets"};
+                        final String[] columnsNames = new String[]{"Name", "Duration", "Repetitions", "Sets"};
 
                         @Override
                         public String getColumnName(int column) {
@@ -140,11 +140,7 @@ public class Client {
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
                 int selectedRow = routineExercisesTable.getSelectedRow();
-                if (selectedRow < 0) {
-                    deleteExerciseFromRoutineButton.setEnabled(false);
-                } else {
-                    deleteExerciseFromRoutineButton.setEnabled(true);
-                }
+                deleteExerciseFromRoutineButton.setEnabled(selectedRow >= 0);
             }
         });
 
@@ -396,7 +392,6 @@ public class Client {
                         break;
                 }
                 workoutPlannerDao.updateExercise(exercises.get(rowIndex));
-                routineExercisesTableModel.fireTableDataChanged();
             }
         };
         exercisesTable = new JTable(exercisesTableModel);
@@ -425,7 +420,8 @@ public class Client {
         scrollPane1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), null, TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
         scrollPane1.setViewportView(routineExercisesTable);
         selectedRoutineLabel = new JLabel();
-        selectedRoutineLabel.setHorizontalTextPosition(0);
+        selectedRoutineLabel.setHorizontalAlignment(11);
+        selectedRoutineLabel.setHorizontalTextPosition(11);
         selectedRoutineLabel.setText("Selected routine: ");
         panel2.add(selectedRoutineLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel3 = new JPanel();
